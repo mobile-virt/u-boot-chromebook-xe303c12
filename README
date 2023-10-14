@@ -7,24 +7,26 @@ It works at today even if some slightly changes are needed to the source code.
 
 HOW TO :
 
-1) Get Devuan 5 from here : https://drive.google.com/u/0/uc?id=1-obTOWKIbgRjQZDjjQazbOtPFHboeA8N&export=download
+1) you should clone this repository : https://github.com/mobile-virt/u-boot-chromebook-xe303c12/
+
+2) Get Devuan 5 from here : https://drive.google.com/u/0/uc?id=1-obTOWKIbgRjQZDjjQazbOtPFHboeA8N&export=download
 (source : https://github.com/quarkscript/linux-armv7-xe303c12-only)
 
 unpack the zipped file and then dd the image file called xe303c12_vubu_xfce_1882M_btrfs_5.15.79.img to a good sd card (I suggest a "SanDisk of 120 GB or more) with the following command :
 
 # dd if=xe303c12_vubu_xfce_1882M_btrfs_5.15.79.img of=/dev/sdg
 
-2) when the cloning process is finished,you have to mount the partition 2 with the command : mount -t auto /dev/sdg2 /mnt/sdg2
+3) when the cloning process is finished,you have to mount the partition 2 with the command : mount -t auto /dev/sdg2 /mnt/sdg2
 
-3) now you should copy the content of /mnt/sdg2 somewhere on the disk of your main PC with the commands : 
+4) now you should copy the content of /mnt/sdg2 somewhere on the disk of your main PC with the commands : 
 
 a) cd /mnt/sdg2
 b) mkdir -p /home/user/downloads/devuan5
 b) rsync -avxHAX * /home/user/downloads/devuan5
 
-4) you should copy this file : 
+5) you should copy this file : https://github.com/mobile-virt/u-boot-chromebook-xe303c12/blob/chromebook/nv_u-boot-snow.kpart to this directory : 
 
-5) Now we need to properly prepare the boot medium for installing u-boot. In the uboot source directory:
+6) Now we need to properly prepare the boot medium for installing u-boot. In the uboot source directory:
 
 $ sudo ./scripts/sdcard.sh /dev/sdX
 
