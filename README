@@ -8,7 +8,50 @@ It works at today even if some slightly changes are needed to the source code.
 
 How To :
 
-1) 
+1) Get Devuan 5 from here : https://drive.google.com/u/0/uc?id=1-obTOWKIbgRjQZDjjQazbOtPFHboeA8N&export=download
+(source : https://github.com/quarkscript/linux-armv7-xe303c12-only)
+
+unpack the zipped file and then dd the image file called xe303c12_vubu_xfce_1882M_btrfs_5.15.79.img to a good sd card (I suggest a "SanDisk of 120 GB or more) with the following command :
+
+# dd if=xe303c12_vubu_xfce_1882M_btrfs_5.15.79.img of=/dev/sdg
+
+2) when the cloning process is finished,you have to mount the partition 2 with the command : mount -t auto /dev/sdg2 /mnt/sdg2
+
+3) now you should copy the content of /mnt/sdg2 somewhere on the disk of your main PC with the commands : 
+
+a) cd /mnt/sdg2
+b) mkdir -p /home/user/downloads/devuan5
+b) rsync -avxHAX * /home/user/downloads/devuan5
+
+4) We need to properly format the boot medium. In the uboot source directory:
+
+$ sudo ./scripts/sdcard.sh /dev/sdX
+
+This will erase all data and create 4 partitions in the medium, along with copying the u-boot binary to the first partition:
+
+
+a) ChromeOS signed binary (our chained u-boot)
+b) Partition 2 not used
+c) EXT2 partition for u-boot files (uImage and exynos5250-snow.dtb)
+d) EXT4 partition for userspace files
+
+to be continued...
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # (C) Copyright 2000 - 2012
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
