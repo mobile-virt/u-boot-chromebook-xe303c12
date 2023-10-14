@@ -94,8 +94,9 @@ https://github.com/mobile-virt/u-boot-chromebook-xe303c12/blob/chromebook/guide/
 
 and copy them to : /mnt/sdg3
 
-to be continued...
+15) umount /mnt/sdg3
 
+16) detach the sd card from your pc and insert it inside the chromebook and try to boot devuan 5.
 
 
 
