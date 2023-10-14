@@ -48,12 +48,18 @@ d) EXT4 partition for userspace files
 
 7) now mount the 4. partition with the command : mount -t auto /dev/sdg4 /mnt/sdg4
 
-8) now you should copy the files that you have previously copied here : /home/user/downloads/devuan5-rootfs to here : /mnt/sdg4,using the usual rsync command : 
+8) now you should copy the files that you have previously copied from here : 
+
+/home/user/downloads/devuan5-rootfs 
+
+to here : /mnt/sdg4
+
+using the usual rsync command : 
 
 # cd /home/user/downloads/devuan5-rootfs
 # rsync -avxHAX * /mnt/sdg4
 
-9) edit the /etc/fstab file like this :
+9) edit the /etc/fstab file,removing everything and adding something like this :
 
 LABEL=BOOT /boot ext4 defaults,noatime,nodiratime,errors=remount-ro 0 2
 LABEL=ROOT / ext4 defaults,noatime,nodiratime,errors=remount-ro 0 1
