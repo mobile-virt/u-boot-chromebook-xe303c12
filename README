@@ -57,11 +57,13 @@ d) EXT4 partition for userspace files
 
 7) now mount the 4. partition with the command : mount -t auto /dev/sdg4 /mnt/sdg4
 
-8) now you should copy the files that you have previously copied from here : 
+8) create this directory : mkdir /mnt/sdg4/devuan5-rootfs
+
+9) now you should copy the files that you have previously copied from here : 
 
 /home/user/downloads/devuan5-rootfs 
 
-to here : /mnt/sdg4
+to here : /mnt/sdg4/devuan5-rootfs 
 
 using the usual rsync command : 
 
@@ -77,6 +79,17 @@ LABEL=ROOT / ext4 defaults,noatime,nodiratime,errors=remount-ro 0 1
 
 11) now let's prepare the appropriate kernel (not higher than 5.4,because on ARM 32 bit
 kvm has been removed starting from qemu 5.2 and main line kernel 5.7,but using 5.4 is better)
+
+12) get this kernel source :
+
+https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.4.258.tar.xz 
+
+and unpack it somewhere,for example in : /home/user/Downloads
+
+13) cd linux-5.4.258 
+
+
+
 
 to be continued...
 
