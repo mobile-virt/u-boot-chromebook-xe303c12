@@ -22,7 +22,7 @@ if [ ! -x ${DTC} ]
 then 
 	DTCSRC=${SCRIPTS}/dtc-src
 	rm -rf ${DTCSRC}
-	git clone http://git.chromium.org/chromiumos/third_party/dtc.git ${DTCSRC}
+	git clone https://chromium.googlesource.com/chromiumos/third_party/dtc ${DTCSRC}
 	cd ${DTCSRC}
 	make -j4
 	cp dtc ${DTC}
