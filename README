@@ -54,9 +54,15 @@ using the usual rsync command :
 # cd /home/user/downloads/devuan5-rootfs
 # rsync -avxHAX * /mnt/sdg4
 
-9) edit the /etc/fstab file...
+9) edit the /etc/fstab file like this :
+
+LABEL=BOOT /boot ext4 defaults,noatime,nodiratime,errors=remount-ro 0 2
+LABEL=ROOT / ext4 defaults,noatime,nodiratime,errors=remount-ro 0 1
 
 10) umount /dev/sdg4
+
+11) now let's prepare the appropriate kernel (not higher than 5.4,because on arm32 kvm has been removed starting from qemu 5.2 
+and main line kernel 5.7,but using 5.4 is better)
 
 to be continued...
 
