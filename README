@@ -80,15 +80,19 @@ LABEL=ROOT / ext4 defaults,noatime,nodiratime,errors=remount-ro 0 1
 11) now let's prepare the appropriate kernel (not higher than 5.4,because on ARM 32 bit
 kvm has been removed starting from qemu 5.2 and main line kernel 5.7,but using 5.4 is better)
 
-12) get this kernel source :
+12) you have to mount the partition 3 with the command : 
 
-https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.4.258.tar.xz 
+mount -t auto /dev/sdg3 /mnt/sdg3
 
-and unpack it somewhere,for example in : /home/user/Downloads
+13) get this kernel file :
 
-13) cd linux-5.4.258 
+https://github.com/mobile-virt/u-boot-chromebook-xe303c12/blob/chromebook/guide/uImage
 
+14) get this file :
 
+https://github.com/mobile-virt/u-boot-chromebook-xe303c12/blob/chromebook/guide/exynos5250-snow.dtb
+
+and copy them to : /mnt/sdg3
 
 
 to be continued...
