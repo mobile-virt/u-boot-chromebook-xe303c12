@@ -10,15 +10,22 @@ HOW TO :
 
 1) you should clone this repository : https://github.com/mobile-virt/u-boot-chromebook-xe303c12/
 
-2) Get Devuan 5 from here : https://drive.google.com/u/0/uc?id=1-obTOWKIbgRjQZDjjQazbOtPFHboeA8N&export=download
+2) Get Devuan 5 from here : 
+
+https://drive.google.com/u/0/uc?id=1-obTOWKIbgRjQZDjjQazbOtPFHboeA8N&export=download
 (source : https://github.com/quarkscript/linux-armv7-xe303c12-only)
 
-unpack the zipped file and then dd the image file called xe303c12_vubu_xfce_1882M_btrfs_5.15.79.img to a good sd card 
-(I suggest a "SanDisk of 120 GB or more) with the following command :
+unpack the zipped file and then dd the image file called : 
+
+xe303c12_vubu_xfce_1882M_btrfs_5.15.79.img 
+
+to a good sd card (I suggest a "SanDisk of 120 GB or more) with the following command :
 
 # dd if=xe303c12_vubu_xfce_1882M_btrfs_5.15.79.img of=/dev/sdg
 
-3) when the cloning process is finished,you have to mount the partition 2 with the command : mount -t auto /dev/sdg2 /mnt/sdg2
+3) when the cloning process is finished,you have to mount the partition 2 with the command : 
+
+mount -t auto /dev/sdg2 /mnt/sdg2
 
 4) now you should copy the content of /mnt/sdg2 somewhere on the disk of your main PC with the commands : 
 
@@ -35,11 +42,13 @@ to this directory :
 
 /home/user/Downloads/u-boot-chromebook/scripts
 
-6) Now you need to properly prepare the boot medium for installing u-boot. In the uboot source directory:
+6) Now you need to properly prepare the boot medium for installing u-boot. 
+In the uboot source directory:
 
 $ sudo ./scripts/sdcard.sh /dev/sdX
 
-This will erase all data and create 4 partitions in the medium, along with copying the u-boot binary to the first partition:
+This will erase all data and create 4 partitions in the medium, 
+along with copying the u-boot binary to the first partition:
 
 a) ChromeOS signed binary (our chained u-boot)
 b) Partition 2 not used
@@ -66,8 +75,8 @@ LABEL=ROOT / ext4 defaults,noatime,nodiratime,errors=remount-ro 0 1
 
 10) umount /dev/sdg4
 
-11) now let's prepare the appropriate kernel (not higher than 5.4,because on arm32 kvm has been removed starting from qemu 5.2 
-and main line kernel 5.7,but using 5.4 is better)
+11) now let's prepare the appropriate kernel (not higher than 5.4,because on ARM 32 bit
+kvm has been removed starting from qemu 5.2 and main line kernel 5.7,but using 5.4 is better)
 
 to be continued...
 
