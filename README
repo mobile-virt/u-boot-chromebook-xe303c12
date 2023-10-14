@@ -49,6 +49,14 @@ d) EXT4 partition for userspace files
 7) now mount the 4. partition with the command : mount -t auto /dev/sdg4 /mnt/sdg4
 
 8) now you should copy the files that you have previously copied here : /home/user/downloads/devuan5-rootfs to here : /mnt/sdg4
+using the usual rsync command : 
+
+# cd /home/user/downloads/devuan5-rootfs
+# rsync -avxHAX * /mnt/sdg4
+
+9) edit the /etc/fstab file...
+
+10) umount /dev/sdg4
 
 to be continued...
 
