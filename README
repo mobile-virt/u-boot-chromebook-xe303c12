@@ -24,7 +24,7 @@ a) cd /mnt/sdg2
 b) mkdir -p /home/user/downloads/devuan5
 b) rsync -avxHAX * /home/user/downloads/devuan5
 
-5) you should copy this file : https://github.com/mobile-virt/u-boot-chromebook-xe303c12/blob/chromebook/nv_u-boot-snow.kpart to this directory : 
+5) you should copy this file : https://github.com/mobile-virt/u-boot-chromebook-xe303c12/blob/chromebook/nv_u-boot-snow.kpart to this directory : /home/user/Downloads/u-boot-chromebook/scripts
 
 6) Now we need to properly prepare the boot medium for installing u-boot. In the uboot source directory:
 
