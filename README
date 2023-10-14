@@ -23,8 +23,9 @@ unpack the zipped file and then dd the image file called xe303c12_vubu_xfce_1882
 4) now you should copy the content of /mnt/sdg2 somewhere on the disk of your main PC with the commands : 
 
 a) cd /mnt/sdg2
-b) mkdir -p /home/user/downloads/devuan5
-b) rsync -avxHAX * /home/user/downloads/devuan5
+b) mkdir -p /home/user/downloads/devuan5-rootfs
+c) rsync -avxHAX * /home/user/downloads/devuan5-rootfs
+d) umount /mnt/sdg2
 
 5) you should copy this file : 
 
@@ -40,11 +41,14 @@ $ sudo ./scripts/sdcard.sh /dev/sdX
 
 This will erase all data and create 4 partitions in the medium, along with copying the u-boot binary to the first partition:
 
-
 a) ChromeOS signed binary (our chained u-boot)
 b) Partition 2 not used
 c) EXT2 partition for u-boot files (uImage and exynos5250-snow.dtb)
 d) EXT4 partition for userspace files
+
+7) now mount the 4. partition with the command : mount -t auto /dev/sdg4 /mnt/sdg4
+
+8) now you should copy the files that you have previously copied here : /home/user/downloads/devuan5-rootfs to here : /mnt/sdg4
 
 to be continued...
 
