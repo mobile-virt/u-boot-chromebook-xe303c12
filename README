@@ -45,7 +45,7 @@ to this directory :
 6) Now you need to properly prepare the boot medium for installing u-boot. 
 In the uboot source directory:
 
-$ sudo ./scripts/sdcard.sh /dev/sdX
+$ sudo ./scripts/sdcard.sh /dev/sdg
 
 This will erase all data and create 4 partitions in the medium, 
 along with copying the u-boot binary to the first partition:
@@ -57,13 +57,11 @@ d) EXT4 partition for userspace files
 
 7) now mount the 4. partition with the command : mount -t auto /dev/sdg4 /mnt/sdg4
 
-8) create this directory : mkdir /mnt/sdg4/devuan5-rootfs
-
-9) now you should copy the files that you have previously copied from here : 
+8) now you should copy the files that you have previously copied from here : 
 
 /home/user/downloads/devuan5-rootfs 
 
-to here : /mnt/sdg4/devuan5-rootfs 
+to here : /mnt/sdg4/
 
 using the usual rsync command : 
 
