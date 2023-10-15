@@ -96,17 +96,27 @@ and copy them to : /mnt/sdg3
 
 16) detach the sd card from your pc and insert it inside the chromebook and try to boot devuan 5.
 
-17) prepare for the configuration and installation of qemu 5.1 :
+17) let's install qemu 5.1 :
 
 # apt install libgtk-3-dev libpulse-dev libgbm-dev libspice-protocol-dev libspice-server-dev libusb-1.0-0-dev libepoxy-dev 
 libfdt-dev flex bison build-essential (for Debian : kconfig-frontends bc rsync libssl-dev:native) pkg-config gettext
 
+# apt install libgtk-3-dev libpulse-dev libgbm-dev libspice-protocol-dev libspice-server-dev libusb-1.0-0-dev libepoxy-dev libfdt-dev
 # git clone -b v5.1.0 http://git.qemu.org/qemu.git
 # git submodule add -f https://git.kernel.org/pub/scm/utils/dtc/dtc.git dtc
-# cd qemu-5.1.0
-# ./configure --disable-werror --target-list=arm-softmmu --enable-opengl --enable-gtk --enable-kvm --enable-guest-agent --enable-spice --audio-drv-list="oss pa" --enable-libusb --enable-trace-backend=simple --enable-debug --prefix=/usr/local
+
+# ./configure --disable-werror --target-list=arm-softmmu --enable-opengl --enable-gtk --enable-kvm --enable-guest-agent --enable-spice 
+--audio-drv-list="oss pa" --enable-libusb --enable-trace-backend=simple --enable-debug
+
+# cd qemu-v5.1.0/
 # make
 # make install
+
+# which qemu-system-arm
+/usr/local/bin/qemu-system-arm
+
+# qemu-system-arm --version
+QEMU emulator version 5.1.0 (v5.1.0-dirty)
 
 18) do install these packages on the system :
 
@@ -115,8 +125,266 @@ linux-image-5.4.0-162-generic_5.4.0-162.179_armhf.deb
 linux-libc-dev_5.4.0-162.179_armhf.deb
 linux-modules-5.4.0-162-generic_5.4.0-162.179_armhf.deb
 
-19) 
+19) apt build-dep libvirt
 
+20) lets install libvirt from source code :
+
+# git clone https://github.com/libvirt/libvirt.git
+# cd libvirt
+# meson setup build
+# ninja -C build
+# sudo ninja -C build install
+# which virsh
+/usr/local/bin/virsh
+
+# which libvirtd
+/usr/local/sbin/libvirtd
+
+21) let's install virt-manager
+
+#
+# ./setup.py configure --prefix=/usr/local
+# ./setup.py install
+
+root@chromarietto:/home/marietto/Desktop/Dati/qemu-v5.1.0# apt install gobject-introspection libosinfo-1.0-0 libosinfo-1.0-dev 
+gir1.2-libosinfo-1.0 libvirt-glib-1.0-dev python3-requests
+
+# sudo usermod -a -G libvirt root
+# sudo usermod -a -G libvirtd root
+# sudo usermod -a -G libvirt-qemu libvirt-qemu
+# sudo usermod -a -G libvirt marietto
+# sudo adduser libvirt-qemu
+# sudo groupadd --system libvirt
+# sudo groupadd --system libvirt-qemu
+# sudo newgrp libvirt-qemu
+# newgrp libvirt
+
+root@chromarietto:/usr/local/sbin# libvirtd &
+[1] 2875
+
+root@chromarietto:/usr/local/sbin# virtqemud &
+[2] 2906
+
+root@chromarietto:/usr/local/sbin# 2023-08-26 22:53:10.190+0000: 2923: info : libvirt version: 9.7.0
+
+2023-08-26 22:53:10.190+0000: 2923: info : hostname: chromarietto
+2023-08-26 22:53:10.190+0000: 2923: error : virPidFileAcquirePathFull:409 : Failed to acquire pid file '/var/local/run/libvirt/qemu/driver.pid': Resource temporarily unavailable
+2023-08-26 22:53:10.192+0000: 2923: error : virStateInitialize:672 : Initialization of QEMU state driver failed: Failed to acquire pid file '/var/local/run/libvirt/qemu/driver.pid': Resource temporarily unavailable
+2023-08-26 22:53:10.192+0000: 2923: error : daemonRunStateInit:617 : Driver state initialization failed
+
+root@chromarietto:/usr/local/sbin# ps ax | grep libvirt
+ 2875 pts/0    Sl     0:00 libvirtd
+ 
+root@chromarietto:/usr/local/sbin# ps ax | grep virtqemu
+
+
+Reddit :
+
+
+Hello.
+
+I'm running Debian bookworm on my ARM Chromebook,model "xe303c12" and I've recompiled the kernel to enable KVM,so now my system sounds like this :
+
+# lsb_release -a
+
+No LSB modules are available. 
+Distributor ID: Debian 
+Description:    Debian GNU/Linux 12 (bookworm) 
+Release:        12 Codename:       bookworm
+
+# uname -a
+Linux chromarietto 5.4.244-stb-cbe #8 SMP PREEMPT Sat Aug 19 22:19:32 UTC 2023 armv7l GNU/Linux
+
+#uname -r
+5.4.244-stb-cbe
+
+#kvm-ok
+INFO: /dev/kvm exists
+KVM acceleration can be used
+
+#qemu-system-arm --version
+
+QEMU emulator version 5.1.0 (v5.1.0-dirty) 
+Copyright (c) 2003-2020 Fabrice Bellard and the QEMU Project developers
+
+python3 --version
+Python 3.11.2
+
+I have installed libvirt 9.7.0,qemu 5.1 and virt-manager from source code with the final goal to be able to connect qemu,kvm and libvirt together and virtualize FreeBSD 13.2 for arm 32 bit. If you ask me why I've recompiled everything from source code,my answer will be complicated,but in short terms,for some unknown reason it reports an error like this :
+
+"Warning : Failed to set up UEFI / The Libvirt version does not support UEFI / Install options are limited"
+
+
+# apt build-dep libvirt
+
+# git clone https://github.com/libvirt/libvirt.git
+Cloning into 'libvirt'...
+
+# cd libvirt
+# meson setup build
+# ninja -C build
+# ninja -C build install
+
+# which virsh
+/usr/local/bin/virsh
+
+# which libvirtd
+/usr/local/sbin/libvirtd
+
+# apt install libgtk-3-dev libpulse-dev libgbm-dev libspice-protocol-dev libspice-server-dev libusb-1.0-0-dev libepoxy-dev libfdt-dev
+
+# git clone -b v5.1.0 http://git.qemu.org/qemu.git
+
+# cd qemu-v5.1.0
+
+# git submodule add -f https://git.kernel.org/pub/scm/utils/dtc/dtc.git dtc
+
+./configure --disable-werror --target-list=arm-softmmu --enable-opengl \
+--enable-gtk --enable-kvm --enable-guest-agent --enable-spice \
+--audio-drv-list="oss pa" --enable-libusb --enable-trace-backend=simple \ 
+--enable-debug
+
+# make
+# make install
+
+# git clone https://github.com/virt-manager/virt-manager.git
+
+# apt install gobject-introspection libosinfo-1.0-0 libosinfo-1.0-dev gir1.2-libosinfo-1.0 libvirt-glib-1.0-dev libunistring-dev xsltproc 
+libxml2-utils python3-pip software-properties-common python3-docutils libgmp-dev libtasn1-6-dev libpciaccess-dev libdevmapper-dev 
+libnl-route-3-dev libnl-3-dev libgnutls28-dev python3-libvirt libgtksourceview-3.0-dev libgtk-vnc-2.0-dev gir1.2-gtk-vnc-2.0 python3-libxml2
+libvte-2.91-dev
+
+# cd virt-manager
+# ./setup.py configure --prefix=/usr/local
+# sudo ./setup.py install
+
+marietto@chromarietto:~$ libvirtd &
+
+[1] 2083
+
+marietto@chromarietto:~$ virt-manager
+
+The error is :
+
+Code:
+
+Unable to connect to libvirt qemu:///system.
+
+error from service: GDBus.Error:org.freedesktop.PolicyKit1.Error.Failed:
+Action org.libvirt.unix.manage is not registered
+
+Libvirt URI is: qemu:///system
+
+Traceback (most recent call last):
+File "/usr/local/share/virt-manager/virtManager/connection.py", line 923, in _do_open
+self._backend.open(cb, data)
+File "/usr/local/share/virt-manager/virtinst/connection.py", line 171, in open
+conn = libvirt.openAuth(self._open_uri,
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+File "/usr/lib/python3/dist-packages/libvirt.py", line 147, in openAuth
+raise libvirtError('virConnectOpenAuth() failed')
+libvirt.libvirtError: error from service: GDBus.Error:org.freedesktop.PolicyKit1.
+Error.Failed: Action org.libvirt.unix.manage is not registered
+
+SOLUTION :
+
+In  /usr/local/share/polkit-1/actions/org.libvirt.unix.policy  I have changed this :
+
+<action id="org.libvirt.unix.manage">
+      <description>Manage local virtualized systems</description>
+      <message>System policy prevents management of local virtualized systems</message>
+      <defaults>
+        <!-- Any program can use libvirt in read/write mode if they
+             provide the root password -->
+        <allow_any>auth_admin_keep</allow_any>
+        <allow_inactive>auth_admin_keep</allow_inactive>
+        <allow_active>auth_admin_keep</allow_active>
+      </defaults>
+    </action>
+
+
+to this :
+
+
+<action id="org.libvirt.unix.manage">
+      <description>Manage local virtualized systems</description>
+      <message>System policy prevents management of local virtualized systems</message>
+      <defaults>
+         <!-- Any program can use libvirt in read/write mode if they
+              provide the root password -->
+         <allow_any>yes</allow_any>
+         <allow_inactive>yes</allow_inactive>
+         <allow_active>yes</allow_active>
+       </defaults>
+      </action>
+
+
+apt remove meson
+python3 -m pip install meson
+
+root@chromarietto:/Dati/libvirt-9.7.0# mkdir build
+root@chromarietto:/Dati/libvirt-9.7.0# cd build
+root@chromarietto:/Dati/libvirt-9.7.0/build# .././configure
+make
+make install
+
+root@chromarietto:/Dati/libvirt-9.7.0# addgroup --quiet --system kvm
+root@chromarietto:/Dati/libvirt-9.7.0# adduser --quiet --system --ingroup kvm --quiet --disabled-login --disabled-password --home /var/lib/libvirt --no-create-home --gecos "Libvirt Qemu" --uid 64055 libvirt-qemu
+
+# virsh domcapabilities --machine virt --emulatorbin /usr/local/bin/qemu-system-arm
+
+root@chromarietto:/Dati/libvirt-9.7.0# systemctl enable virtlogd
+root@chromarietto:/Dati/libvirt-9.7.0# systemctl start virtlogd
+
+
+On Devuan 5 :
+
+
+Error : Unable to find 'dnsmasq' binary in $PATH: No such file or directory
+
+root@devuan-bunsen:/Dati/libvirt-9.7.0# libvirtd &
+
+[1] 7860
+
+root@devuan-bunsen:/Dati/libvirt-9.7.0# 2023-09-19 21:30:21.579+0000: 7876: info : libvirt version: 9.7.0
+2023-09-19 21:30:21.579+0000: 7876: info : hostname: devuan-bunsen
+2023-09-19 21:30:21.579+0000: 7876: error : dnsmasqCapsNewFromBinary:672 : Unable to find 'dnsmasq' binary in $PATH: No such file or directory
+
+Solution : https://askubuntu.com/questions/191226/dnsmasq-failed-to-create-listening-socket-for-port-53-address-already-in-use
+
+Step 1 :
+
+root@devuan-bunsen:/Dati/libvirt-9.7.0# apt install dnsmasq
+
+Starting DNS forwarder and DHCP server: dnsmasq
+dnsmasq: failed to create listening socket for port 53: Address already in use
+ failed!
+
+Step 2: Edit /etc/dnsmasq.conf
+
+sudo nano /etc/dnsmasq.conf
+
+Step 3: Change port 53 -> 5353
+
+# Listen on this specific port instead of the standard DNS port
+# (53). Setting this to zero completely disables DNS function,
+# leaving only DHCP and/or TFTP.
+port=5353
+
+# Set Listen address
+listen-address=127.0.0.1
+
+On Devuan 5 :
+
+Error : Initialization of QEMU state driver failed: invalid argument: Failed to parse group 'libvirt-qemu'
+
+2023-09-19 22:09:39.772+0000: 2171: error : virGetGroupID:840 : invalid argument: Failed to parse group 'libvirt-qemu'
+2023-09-19 22:09:39.772+0000: 2171: error : virStateInitialize:672 : Initialization of QEMU state driver failed: invalid argument: Failed to parse group 'libvirt-qemu'
+2023-09-19 22:09:39.772+0000: 2171: error : daemonRunStateInit:617 : Driver state initialization failed
+
+Solution :
+
+root@devuan-bunsen:/var/lib# addgroup --quiet --system libvirt-qemu
 
 
 
