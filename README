@@ -129,22 +129,22 @@ linux-image-5.4.0-162-generic_5.4.0-162.179_armhf.deb
 linux-libc-dev_5.4.0-162.179_armhf.deb
 linux-modules-5.4.0-162-generic_5.4.0-162.179_armhf.deb
 
-19) apt build-dep libvirt
+19) lets install libvirt from source code :
 
-20) lets install libvirt from source code :
-
+# build-dep libvirt
 # git clone https://github.com/libvirt/libvirt.git
 # cd libvirt
 # meson setup build
 # ninja -C build
 # sudo ninja -C build install
+
 # which virsh
 /usr/local/bin/virsh
 
 # which libvirtd
 /usr/local/sbin/libvirtd
 
-21) let's install virt-manager
+20) let's install virt-manager
 
 # apt install gobject-introspection libosinfo-1.0-0 libosinfo-1.0-dev gir1.2-libosinfo-1.0 
 libvirt-glib-1.0-dev python3-requests
