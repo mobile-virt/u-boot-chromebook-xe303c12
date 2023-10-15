@@ -142,7 +142,8 @@ linux-modules-5.4.0-162-generic_5.4.0-162.179_armhf.deb
 
 21) let's install virt-manager
 
-#
+# git clone https://github.com/virt-manager/virt-manager.git
+# cd virt-manager
 # ./setup.py configure --prefix=/usr/local
 # ./setup.py install
 
