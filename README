@@ -43,6 +43,7 @@ to this directory :
 /home/user/Downloads/u-boot-chromebook/scripts
 
 6) Now you need to properly prepare the boot medium for installing u-boot. 
+
 In the uboot source directory:
 
 $ sudo ./scripts/sdcard.sh /dev/sdg
@@ -68,48 +69,54 @@ using the usual rsync command :
 # cd /home/user/downloads/devuan5-rootfs
 # rsync -avxHAX * /mnt/sdg4
 
-9) edit the /etc/fstab file,removing everything and adding something like this :
+9) get these kernel modules :
+
+https://github.com/mobile-virt/u-boot-chromebook-xe303c12/blob/chromebook/guide/5.4.257-chromarietto-exy.tar.gz
+
+unpack and copy the content in /mnt/sdg4/lib/modules/
+
+10) edit the /etc/fstab file,removing everything and adding something like this :
 
 LABEL=BOOT /boot ext4 defaults,noatime,nodiratime,errors=remount-ro 0 2
 LABEL=ROOT / ext4 defaults,noatime,nodiratime,errors=remount-ro 0 1
 
-10) umount /dev/sdg4
+11) umount /dev/sdg4
 
-11) now let's prepare the appropriate kernel (not higher than 5.4,because on ARM 32 bit
+12) now let's prepare the appropriate kernel (not higher than 5.4,because on ARM 32 bit
 kvm has been removed starting from qemu 5.2 and main line kernel 5.7,but using 5.4 is better)
 
-12) you have to mount the partition 3 on the sdcard with the command : 
+13) you have to mount the partition 3 on the sdcard with the command : 
 
 mount -t auto /dev/sdg3 /mnt/sdg3
 
-13) get this kernel file :
+14) get this kernel file :
 
 https://github.com/mobile-virt/u-boot-chromebook-xe303c12/blob/chromebook/guide/uImage
 
-14) and get this file :
+15) and get this file :
 
 https://github.com/mobile-virt/u-boot-chromebook-xe303c12/blob/chromebook/guide/exynos5250-snow.dtb
 
 and copy them to : /mnt/sdg3
 
-15) umount /mnt/sdg3
+16) umount /mnt/sdg3
 
-16) detach the sd card from your pc and insert it inside the chromebook and try to boot devuan 5.
+17) detach the sd card from your pc and insert it inside the chromebook and try to boot devuan 5.
 
-17) let's install qemu 5.1 :
+18) let's install qemu 5.1 :
 
 # apt install libgtk-3-dev libpulse-dev libgbm-dev libspice-protocol-dev 
 libspice-server-dev libusb-1.0-0-dev libepoxy-dev libfdt-dev flex bison build-essential 
 (for Debian : kconfig-frontends bc rsync libssl-dev:native) pkg-config gettext
 
-# apt install libgtk-3-dev libpulse-dev libgbm-dev libspice-protocol-dev 
+# apt install libgtk-3-dev libpulse-dev libgbm-dev libspice-protocol-dev \
 libspice-server-dev libusb-1.0-0-dev libepoxy-dev libfdt-dev
 
 # git clone -b v5.1.0 http://git.qemu.org/qemu.git
 # git submodule add -f https://git.kernel.org/pub/scm/utils/dtc/dtc.git dtc
 
-# ./configure --disable-werror --target-list=arm-softmmu --enable-opengl --enable-gtk 
---enable-kvm --enable-guest-agent --enable-spice --audio-drv-list="oss pa" 
+# ./configure --disable-werror --target-list=arm-softmmu --enable-opengl --enable-gtk \
+--enable-kvm --enable-guest-agent --enable-spice --audio-drv-list="oss pa" \
 --enable-libusb --enable-trace-backend=simple --enable-debug
 
 # cd qemu-v5.1.0/
@@ -122,14 +129,14 @@ libspice-server-dev libusb-1.0-0-dev libepoxy-dev libfdt-dev
 # qemu-system-arm --version
 QEMU emulator version 5.1.0 (v5.1.0-dirty)
 
-18) do install these packages on the system :
+19) do install these packages on the system :
 
 linux-headers-5.4.0-162_5.4.0-162.179_all.deb
 linux-image-5.4.0-162-generic_5.4.0-162.179_armhf.deb
 linux-libc-dev_5.4.0-162.179_armhf.deb
 linux-modules-5.4.0-162-generic_5.4.0-162.179_armhf.deb
 
-19) lets install libvirt from source code :
+20) lets install libvirt from source code :
 
 # build-dep libvirt
 # git clone https://github.com/libvirt/libvirt.git
@@ -144,7 +151,7 @@ linux-modules-5.4.0-162-generic_5.4.0-162.179_armhf.deb
 # which libvirtd
 /usr/local/sbin/libvirtd
 
-20) let's install virt-manager
+21) let's install virt-manager
 
 # apt install gobject-introspection libosinfo-1.0-0 libosinfo-1.0-dev gir1.2-libosinfo-1.0 
 libvirt-glib-1.0-dev python3-requests libunistring-dev xsltproc libxml2-utils python3-pip 
@@ -160,7 +167,7 @@ libgtksourceview-3.0-dev libgtk-vnc-2.0-dev gir1.2-gtk-vnc-2.0 python3-libxml2
 # libvirtd &
 # virtlogd &
 
-21) setting dnsmasq
+22) setting dnsmasq
 
 a) apt install dnsmasq
 b) nano /etc/dnsmasq.conf
@@ -174,16 +181,23 @@ port=5353
 # Set Listen address
 listen-address=127.0.0.1
 
-22) add group kvm :
+23) add group kvm :
 
 # addgroup --quiet --system kvm
 
 # adduser --quiet --system --ingroup kvm --quiet --disabled-login --disabled-password --home /var/lib/libvirt --no-create-home 
 --gecos "Libvirt Qemu" --uid 64055 libvirt-qemu
 
-23) check if everything is working greaat :
+24) check if everything is working greaat :
 
 # virsh domcapabilities --machine virt --emulatorbin /usr/local/bin/qemu-system-arm
+
+
+
+
+
+
+
 
 
 
