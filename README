@@ -155,7 +155,7 @@ libvirt-glib-1.0-dev python3-requests
 # ./setup.py install
 
 # libvirtd &
-# virlogd &
+# virtlogd &
 
 
 
