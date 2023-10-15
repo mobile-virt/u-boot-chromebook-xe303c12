@@ -108,6 +108,15 @@ libfdt-dev flex bison build-essential (for Debian : kconfig-frontends bc rsync l
 # make
 # make install
 
+18) do install these packages on the system :
+
+linux-headers-5.4.0-162_5.4.0-162.179_all.deb
+linux-image-5.4.0-162-generic_5.4.0-162.179_armhf.deb
+linux-libc-dev_5.4.0-162.179_armhf.deb
+linux-modules-5.4.0-162-generic_5.4.0-162.179_armhf.deb
+
+19) 
+
 
 
 
