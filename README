@@ -98,8 +98,8 @@ and copy them to : /mnt/sdg3
 
 17) prepare for the configuration and installation of qemu 5.1 :
 
-# apt install libgtk-3-dev libpulse-dev libgbm-dev libspice-protocol-dev libspice-server-dev libusb-1.0-0-dev libepoxy-dev libfdt-dev flex bison 
-build-essential (for Debian : kconfig-frontends bc rsync libssl-dev:native) pkg-config gettext
+# apt install libgtk-3-dev libpulse-dev libgbm-dev libspice-protocol-dev libspice-server-dev libusb-1.0-0-dev libepoxy-dev libfdt-dev flex bison build-essential
+(for Debian : kconfig-frontends bc rsync libssl-dev:native) pkg-config gettext
 
 # git clone -b v5.1.0 http://git.qemu.org/qemu.git
 # git submodule add -f https://git.kernel.org/pub/scm/utils/dtc/dtc.git dtc
