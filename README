@@ -160,6 +160,21 @@ libgtksourceview-3.0-dev libgtk-vnc-2.0-dev gir1.2-gtk-vnc-2.0 python3-libxml2
 # libvirtd &
 # virtlogd &
 
+21) setting dnsmasq
+
+a) apt install dnsmasq
+b) nano /etc/dnsmasq.conf
+c) Change port 53 -> 5353
+
+# Listen on this specific port instead of the standard DNS port
+# (53). Setting this to zero completely disables DNS function,
+# leaving only DHCP and/or TFTP.
+port=5353
+
+# Set Listen address
+listen-address=127.0.0.1
+
+22) 
 
 
 
