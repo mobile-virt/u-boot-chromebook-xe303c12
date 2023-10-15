@@ -2,7 +2,9 @@ This is the u-boot code forked from :
 
 https://github.com/virtualopensystems/u-boot/
 
-and updated to today,with the goal to virtualize FreeBSD or Linux on the ARM Chromebook model xe303c12 using qemu and kvm on a more recent kernel version (5.4.257) on top of an upgraded Linux distro (Devuan 5 or Ubuntu 22.04)
+and updated to today,with the goal to virtualize FreeBSD or Linux on the ARM Chromebook model xe303c12 
+using qemu and kvm on a more recent kernel version (5.4.257) on top of an upgraded Linux distro (Devuan 5 or Ubuntu 22.04)
+
 It works at today even if some slightly changes are needed to the source code. 
 
 HOW TO :
