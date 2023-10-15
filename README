@@ -147,7 +147,10 @@ linux-modules-5.4.0-162-generic_5.4.0-162.179_armhf.deb
 20) let's install virt-manager
 
 # apt install gobject-introspection libosinfo-1.0-0 libosinfo-1.0-dev gir1.2-libosinfo-1.0 
-libvirt-glib-1.0-dev python3-requests
+libvirt-glib-1.0-dev python3-requests libunistring-dev xsltproc libxml2-utils python3-pip 
+software-properties-common python3-docutils libgmp-dev libtasn1-6-dev libpciaccess-dev 
+libdevmapper-dev libnl-route-3-dev libnl-3-dev libgnutls28-dev python3-libvirt libvte-2.91-dev  
+libgtksourceview-3.0-dev libgtk-vnc-2.0-dev gir1.2-gtk-vnc-2.0 python3-libxml2 
 
 # git clone https://github.com/virt-manager/virt-manager.git
 # cd virt-manager
