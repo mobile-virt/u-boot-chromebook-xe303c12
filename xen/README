@@ -33,9 +33,9 @@ Number  Start (sector)    End (sector)  Size       Code  Name
    4         1116160        21528542   9.7 GiB     8300
 user@devuan-bunsen ~ %
 
-The fourth partition might be much larger than shown here, but the other 3 partitions should have all the settings shown here, and the fourth partitons should start at sector 1116160 and have Code 8300 just as the third partition does.
+The fourth partition might be much larger than shown here, but the other 3 partitions should have all the settings shown here, and the fourth partiton should start at sector 1116160 and have Code 8300 just as the third partition does.
 
-On the first partition is the u-boot image that enables hypervisor mode, the second partition is unused, the third partition is mounted at /boot, and the fourth partition is mounted as the root partition..
+On the first partition is the u-boot image that enables hypervisor mode, the second partition is unused, the third partition is mounted at /boot, and the fourth partition is mounted as the root partition.
 
 ## Adding support for Xen as a new installation (destroys user data in the current installation)
 This method of adding Xen support destroys the data on the root partition and the /boot partition and replaces it with new filesystem images that include both the 5.4.257-chromarietto-exy kernel with kvm support and the 6.1.59-stb-xen-cbe+ kernel with Xen support. Make backups of any data on the root partition or the /boot partition that you want to keep before proceeding with this method.
@@ -45,7 +45,7 @@ These filesystem images are created from the Devuan 5 image here (the same sourc
 https://drive.google.com/u/0/uc?id=1-obTOWKIbgRjQZDjjQazbOtPFHboeA8N&export=download
 (source : https://github.com/quarkscript/linux-armv7-xe303c12-only)
 
-For this method, do not use the xe303c12_vubu_xfce_1882M_btrfs_5.15.79.img directly.Instead, download these two image files derived from it :
+For this method, do not use the xe303c12_vubu_xfce_1882M_btrfs_5.15.79.img directly. Instead, download these two image files derived from it :
 
 1. https://drive.google.com/file/d/1ybbzb7SOArC8vd7W7muv1IAXpT-FBoPE/view?usp=drive_link
 
