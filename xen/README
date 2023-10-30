@@ -66,6 +66,8 @@ Either remove the SD card from the Chromebook and plug it into another computer 
 localhost ~/Downloads $ gzip -c -d xe303c12_vubu-xen-BOOT3.img.gz | sudo dd of=/dev/mmcblk1p3 bs=1M
 localhost ~/Downloads $ gzip -c -d xe303c12_vubu-xen-ROOT4.img.gz | sudo dd of=/dev/mmcblk1p4 bs=1M
 
+Now the SD card should be prepared to boot into either the normal 5.4.257-chromarietto-exy system or into Xen and dom0 with Linux version 6.1.59, following step 7 in the section below, near the bottom of this page, on adding Xen support as an upgrade.
+
 These images were created as follows :
 
 1. Complete the steps in the README of the top level of this repository to install Devuan 5 and the 5.4.257-chromarietto-exy kernel with support for kvm.
