@@ -70,7 +70,7 @@ These images were created as follows :
 
 1. Complete the steps in the README of the top level of this repository to install Devuan 5 and the 5.4.257-chromarietto-exy kernel with support for kvm.
 
-2. Boot into the Devuan 5 system, and do sudo apt-get update && sudo apt-get upgrade after configuring the system for network accessand setting the correct date and time.
+2. Boot into the Devuan 5 system, and do sudo apt-get update && sudo apt-get upgrade after configuring the system for network access and setting the correct date and time.
 
 3. There will be an error from apt-get at this point, the bunsen-conky package fails on the first try because it conflicts with the bunsen-configs package. Fortunately, this is easy to fix :
 
