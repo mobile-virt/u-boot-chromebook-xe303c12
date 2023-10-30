@@ -152,16 +152,14 @@ user@devuan-bunsen / % sudo apt-get clean && sudo apt-get autoremove
 4. To boot Xen using u-boot, it is necessary to wrap the xen-4.17-armhf kernel in u-boot format with a LOADADDR set appropriately :
 ```
 user@devuan-bunsen / % sudo mkimage -A arm -T kernel -C none -a 0x51004000 -e 0x51004000 -d xen-4.17-armhf xen-4.17-armhf-armmp-0x51004000.ub
-user@devuan-bunsen / % cd
 ```
 5. The 6.1.59 kernel looks for init at /init instead of /sbin/init. So create a symbolic like as follows if it does not exist :
 ```
-user@devuan-bunsen ~ % cd /
 user@devuan-bunsen / % sudo ln -s sbin/init init
 ```
 6. Create the u-boot shell commands that will be used to boot Xen and dom0 :
 
-Create a file named bootxen.source with these contents : 
+Create a file in a work directory named bootxen.source with these contents : 
 ```
 mmc dev 1 && mmc rescan 1
 ext2load mmc 1:3 0x42000000 zImage-6.1.59-stb-xen-cbe+
