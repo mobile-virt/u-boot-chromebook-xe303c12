@@ -98,7 +98,7 @@ user@devuan-bunsen / % sudo mkimage -A arm -T kernel -C none -a 0x51004000 -e 0x
 
 6. Edit /var/lib/connman/settings - set WiFi enable to true
 
-7. Edit /etc/fstab so only the two mount points for / and /boot are enabled (/ is ext4 and /boot is ext2) :
+7. Check that /etc/fstab has the two mount points for / and /boot (/ is ext4 and /boot is ext2). It should like :
 
 LABEL=ROOT /    ext4    defaults 0       0
 LABEL=BOOT /boot    ext2    defaults 0       0
@@ -110,9 +110,11 @@ LABEL=BOOT /boot    ext2    defaults 0       0
 10. The 6.1.59 kernel looks for init at /init instead of /sbin/init. So do :
 
 user@devuan-bunsen ~ % cd /
-user@devuan-bunsen / % sudo ln -s sbin/init init 
+user@devuan-bunsen / % sudo ln -s sbin/init init
 
-11. Shutdown the Chromebook and either reboot the Chromebook in Chrome OS mode or move the SD card to another computer to create the images with commands like this :
+11. Follow the steps in the next section at steps 6 and 7 to create and install the bootxen.scr file in /boot. Only the bootxen.scr file needs to be installed on the image, the bootxen.source file is only necessary to create the binary bootxen.scr using mkimage.
+
+12. Shutdown the Chromebook and either reboot the Chromebook in Chrome OS mode or move the SD card to another computer to create the images with commands like this :
 
 localhost ~/Downloads $ sudo dd if=/dev/mmcblk1p3 bs=1M | gzip - > xe303c12_vubu-xen-BOOT3.img.gz
 localhost ~/Downloads $ sudo dd if=/dev/mmcblk1p4 bs=1M | gzip - > xe303c12_vubu-xen-ROOT4.img.gz
