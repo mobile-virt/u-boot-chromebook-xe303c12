@@ -33,7 +33,7 @@ Number  Start (sector)    End (sector)  Size       Code  Name
    4         1116160        21528542   9.7 GiB     8300
 user@devuan-bunsen ~ %
 
-The fourth partition might be much larger than shown here, but the other 3 partitions should have all the settings shown here, and the fourth partiton should start at sector 1116160 and have Code 8300 just as the third partition does.
+The fourth partition might be much larger than shown here, but the other 3 partitions should have all the settings shown here, and the fourth partiton should start at sector 1116160 and have Code 8300 just as the third partition does. If the fourth partition is smaller in size than the one shown here, expand it to at least the size shown above (9.7 GB) before trying the first method below of overwriting partitions 3 and 4 with new filesystem images that are provided in the links in this README file. After installing the new filesystem images, use resize2fs to expand the filesystem in partition 4 to the full size of the fourth partition, if the fourth partition is larger than the size of 9.7 GB shown above.
 
 On the first partition is the u-boot image that enables hypervisor mode, the second partition is unused, the third partition is mounted at /boot, and the fourth partition is mounted as the root partition.
 
