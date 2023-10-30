@@ -55,9 +55,9 @@ The two files are xe303c12_vubu-xen-BOOT3.img.gz and xe303c12_vubu-xen-ROOT4.img
 
 They correspond to the third and fourth partition of the SD card after it is installed with Devuan 5 and the Linux version 5.4.257-chromarietto-exy kernel with support for kvm on the Chromebook Snow.
 
-This method overwrites the filesystems in the third and fourth  partitions with the filesystem images in these two files, so this is another warning to backup any data on the third or fourth partition of the SD card that needs to be preserved.
+This method overwrites the filesystems in the third and fourth partitions with the filesystem images in these two files, so this is another warning to backup any data on the third or fourth partition of the SD card that needs to be preserved.
 
-Either remove the SD card from the Chromebook and plug it into another computer where its raw partitions can be accessed directly, or if the Chromebook Snow is configured to be able to boot into Chrome OS Developer Mode, boot into Chrome OS developer mode (Ctrl + d) and then when Chrome OD developer mode is fully loaded, go to the terminal command line interface (Ctrl-Alt->) and first check if either /dev/mmcblk1p3 or /dev/mmcblk1p4 is mounted and if so, unmount them both. Then copy the xe303c12_vubu-xen-BOOT3.img.gz and xe303c12_vubu-xen-ROOT4.img.gz files to the device where the SD card is installed. If using Chrome OS developer mode, access to downloaded files is in the /home/chronos/Downloads folder. 
+Either remove the SD card from the Chromebook and plug it into another computer where its raw partitions can be accessed directly, or if the Chromebook Snow is configured to be able to boot into Chrome OS Developer Mode, boot into Chrome OS developer mode (Ctrl + d) and then when Chrome OS developer mode is fully loaded, go to the terminal command line interface (Ctrl-Alt->) and first check if either /dev/mmcblk1p3 or /dev/mmcblk1p4 is mounted and if so, unmount them both. Then copy the xe303c12_vubu-xen-BOOT3.img.gz and xe303c12_vubu-xen-ROOT4.img.gz files to the device where the SD card is installed. If using Chrome OS developer mode, access to downloaded files is in the /home/chronos/Downloads folder. 
 
 3. Overwrite partition 3 and partition 4 with the downloaded images :
 
