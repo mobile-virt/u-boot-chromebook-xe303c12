@@ -192,7 +192,7 @@ listen-address=127.0.0.1
 
 # virsh domcapabilities --machine virt --emulatorbin /usr/local/bin/qemu-system-arm
 
-
+24) experiment with Xen: see the xen/README file for more information.
 
 
 

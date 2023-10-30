@@ -1,0 +1,201 @@
+# Experimental Xen Support
+
+It is possible to boot Linux 6.1.y as Xen dom0 on the Chromebook xe303c12, aka Snow, but so far the graphics does not work.
+
+## Prerequisites
+This guide presumes the Chromebook Snow is already configured to boot Linux 5.4.257 with kvm support and Devuan 5 from an SD card as described in the top-level README of this repository.
+
+The partiton table should look like:
+
+user@devuan-bunsen ~ % sudo gdisk -l /dev/mmcblk1
+GPT fdisk (gdisk) version 1.0.9
+
+Partition table scan:
+  MBR: protective
+  BSD: not present
+  APM: not present
+  GPT: present
+
+Found valid GPT with protective MBR; using GPT.
+Disk /dev/mmcblk1: 249737216 sectors, 119.1 GiB
+Sector size (logical/physical): 512/512 bytes
+Disk identifier (GUID): 812B6AA8-B586-4B26-B8D2-08CEE675890A
+Partition table holds up to 128 entries
+Main partition table begins at sector 2 and ends at sector 33
+First usable sector is 34, last usable sector is 249737182
+Partitions will be aligned on 2048-sector boundaries
+Total free space is 23410654 sectors (11.2 GiB)
+
+Number  Start (sector)    End (sector)  Size       Code  Name
+   1            2048           34815   16.0 MiB    7F00
+   2           34816           67583   16.0 MiB    7F00
+   3           67584         1116159   512.0 MiB   8300
+   4         1116160        21528542   9.7 GiB     8300
+user@devuan-bunsen ~ %
+
+The fourth partition might be much larger than shown here, but the other 3 partitions should have all the settings shown here, and the fourth partitons should start at sector 1116160 and have Code 8300 just as the third partition does.
+
+On the first partition is the u-boot image that enables hypervisor mode, the second partition is unused, the third partition is mounted at /boot, and the fourth partition is mounted as the root partition..
+
+## Adding support for Xen as a new installation (destroys user data in the current installation)
+This method of adding Xen support destroys the data on the root partition and the /boot partition and replaces it with new filesystem images that include both the 5.4.257-chromarietto-exy kernel with kvm support and the 6.1.59-stb-xen-cbe+ kernel with Xen support. Make backups of any data on the root partition or the /boot partition that you want to keep before proceeding with this method.
+
+These filesystem images are created from the Devuan 5 image here (the same source for Devuan 5 as in the top-level README) :
+
+https://drive.google.com/u/0/uc?id=1-obTOWKIbgRjQZDjjQazbOtPFHboeA8N&export=download
+(source : https://github.com/quarkscript/linux-armv7-xe303c12-only)
+
+For this method, do not use the xe303c12_vubu_xfce_1882M_btrfs_5.15.79.img directly.Instead, download these two image files derived from it :
+
+1. https://drive.google.com/file/d/1ybbzb7SOArC8vd7W7muv1IAXpT-FBoPE/view?usp=drive_link
+
+2. https://drive.google.com/file/d/1nD5T--3oPeFBRAR_EekHoVK9oK_Xrdwl/view?usp=drive_link
+
+The two files are xe303c12_vubu-xen-BOOT3.img.gz and xe303c12_vubu-xen-ROOT4.img.gz
+
+They correspond to the third and fourth partition of the SD card after it is installed with Devuan 5 and the Linux version 5.4.257-chromarietto-exy kernel with support for kvm on the Chromebook Snow.
+
+This method overwrites the filesystems in the third and fourth  partitions with the filesystem images in these two files, so this is another warning to backup any data on the third or fourth partition of the SD card that needs to be preserved.
+
+Either remove the SD card from the Chromebook and plug it into another computer where its raw partitions can be accessed directly, or if the Chromebook Snow is configured to be able to boot into Chrome OS Developer Mode, boot into Chrome OS developer mode (Ctrl + d) and then when Chrome OD developer mode is fully loaded, go to the terminal command line interface (Ctrl-Alt->) and first check if either /dev/mmcblk1p3 or /dev/mmcblk1p4 is mounted and if so, unmount them both. Then copy the xe303c12_vubu-xen-BOOT3.img.gz and xe303c12_vubu-xen-ROOT4.img.gz files to the device where the SD card is installed. If using Chrome OS developer mode, access to downloaded files is in the /home/chronos/Downloads folder. 
+
+3. Overwrite partition 3 and partition 4 with the downloaded images :
+
+*Warning* - make sure the parameters of=/dev/mmcblk1p3 and of=/dev/mmcblk1p4 are the actual partitions on the SD card that the Chromebook boots from. A mistake here will cause data loss. You have been warned.
+
+localhost ~/Downloads $ gzip -c -d xe303c12_vubu-xen-BOOT3.img.gz | sudo dd of=/dev/mmcblk1p3 bs=1M
+localhost ~/Downloads $ gzip -c -d xe303c12_vubu-xen-ROOT4.img.gz | sudo dd of=/dev/mmcblk1p4 bs=1M
+
+These images were created as follows :
+
+1. Complete the steps in the README of the top level of this repository to install Devuan 5 and the 5.4.257-chromarietto-exy kernel with support for kvm.
+
+2. Boot into the Devuan 5 system, and do sudo apt-get update && sudo apt-get upgrade after configuring the system for network accessand setting the correct date and time.
+
+3. There will be an error from apt-get at this point, the bunsen-conky package fails on the first try because it conflicts with the bunsen-configs package. Fortunately, this is easy to fix :
+
+user@devuan-bunsen ~ % sudo apt-get remove bunsen-configs
+
+This will take a little while, but it should now succeed with the upgrade.
+
+Then after apt-get is happy again:
+
+user@devuan-bunsen ~ % sudo apt-get install bunsen-configs
+user@devuan-bunsen ~ % sudo apt-get upgrade
+user@devuan-bunsen ~ % sudo apt-get dist-upgrade
+user@devuan-bunsen ~ % sudo apt-get autoremove
+
+4. Install the Xen software packages and optionally clean the package download cache :
+
+user@devuan-bunsen ~ % sudo apt-get install xen-system-armhf
+user@devuan-bunsen ~ % sudo apt-get clean
+
+5. To boot Xen using u-boot, it is necessary to wrap the xen-4.17-armhf kernel in u-boot format with a LOADADDR set appropriately :
+user@devuan-bunsen ~ % cd /
+user@devuan-bunsen / % sudo mkimage -A arm -T kernel -C none -a 0x51004000 -e 0x51004000 -d xen-4.17-armhf xen-4.17-armhf-armmp-0x51004000.ub
+
+6. Edit /var/lib/connman/settings - set WiFi enable to true
+
+7. Edit /etc/fstab so only the two mount points for / and /boot are enabled (/ is ext4 and /boot is ext2) :
+
+LABEL=ROOT /    ext4    defaults 0       0
+LABEL=BOOT /boot    ext2    defaults 0       0
+
+8. Install the Linux 6.1.59-stb-xen-cbe+ kernel with Xen support according to the instructions below for adding support for Xen as an upgrade.
+
+9. Follow steps 5 and 6 below to install the bootxen.scr script in /boot. 
+
+10. Shutdown the Chromebook and either reboot the Chromebook in Chrome OS mode or move the SD card to another computer to create the images with commands like this :
+
+localhost ~/Downloads $ sudo dd if=/dev/mmcblk1p3 bs=1M | gzip - > xe303c12_vubu-xen-BOOT3.img.gz
+localhost ~/Downloads $ sudo dd if=/dev/mmcblk1p4 bs=1M | gzip - > xe303c12_vubu-xen-ROOT4.img.gz
+
+## Adding support for Xen as an upgrade (does not destroy the current installation)
+Xen support requires a Linux kernel with support for runing as dom0 on the Xen hypervisor. For more information, please refer to support pages at https://xenproject.org. A version 6.1.59 Linux kernel with support for running as dom0 on Xen is available here :
+
+To install a kernel with Xen support as an upgrade of the installation with support for kvm created by following the instructions on the main README of this repository, follow these steps on the Chromebook to be upgraded with Xen support :
+
+1. Download the kernel from here : https://github.com/mobile-virt/arm-legacy-kvm/releases/download/2023-10-28/linux-6.1.59-stb-xen-cbe+-arm.tar.gz
+
+2. Extract the necessary kernel files into the filesystem from the tar.gz kernel package :
+
+user@devuan-bunsen ~ % cd /
+user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.59-stb-xen-cbe+-arm.tar.gz boot/zImage-6.1.59-stb-xen-cbe+
+user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.59-stb-xen-cbe+-arm.tar.gz lib/modules
+user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.59-stb-xen-cbe+-arm.tar.gz boot/config-6.1.59-stb-xen-cbe+
+user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.59-stb-xen-cbe+-arm.tar.gz boot/dtbs/6.1.59-stb-xen-cbe+/exynos5250-snow.dtb
+user@devuan-bunsen / % sudo mv boot/dtbs/6.1.59-stb-xen-cbe+/exynos5250-snow.dtb boot/exynos5250-snow-6.1.59-stb-xen-cbe+.dtb
+user@devuan-bunsen / % sudo rmdir boot/dtbs/6.1.59-stb-xen-cbe+
+
+This next one is optional and is only needed if booting this 6.1.59 kernel without Xen is desired or can be done later :
+user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.59-stb-xen-cbe+-arm.tar.gz boot/uImage-6.1.59-stb-xen-cbe+
+
+3. Next it is necessary to install the Xen system software packages :
+
+user@devuan-bunsen / % sudo apt update
+user@devuan-bunsen / % sudo apt install xen-system-armhf
+ 
+4. To boot Xen using u-boot, it is necessary to wrap the xen-4.17-armhf kernel in u-boot format with a LOADADDR set appropriately :
+
+user@devuan-bunsen / % sudo mkimage -A arm -T kernel -C none -a 0x51004000 -e 0x51004000 -d xen-4.17-armhf xen-4.17-armhf-armmp-0x51004000.ub
+user@devuan-bunsen / % cd
+
+5. Create the u-boot shell commands that will be used to boot Xen and dom0 :
+
+Create a file named bootxen.source with these contents : 
+ 
+mmc dev 1 && mmc rescan 1
+ext2load mmc 1:3 0x42000000 zImage-6.1.59-stb-xen-cbe+
+ext2load mmc 1:3 0x51000000 xen-4.17-armhf-armmp-0x51004000.ub
+ext2load mmc 1:3 0x5ffec000 exynos5250-snow-6.1.59-stb-xen-cbe+.dtb
+fdt addr 0x5ffec000
+fdt resize 1024
+fdt set /chosen \#address-cells <0x2>
+fdt set /chosen \#size-cells <0x2>
+fdt set /chosen xen,xen-bootargs "console=dtuart dtuart=serial0 dom0_mem=1G dom0_max_vcpus=2 bootscrub=0 vwfi=native sched=null"
+fdt mknod /chosen dom0
+fdt set /chosen/dom0 compatible  "xen,linux-zimage" "xen,multiboot-module" "multiboot,module"
+fdt set /chosen/dom0 reg <0x0 0x42000000 0x0 0x7D3200 >
+fdt set /chosen xen,dom0-bootargs "console=tty1 root=/dev/mmcblk1p4 rw rootwait clk_ignore_unused --no-log"
+bootm 0x51000000 - 0x5ffec000
+
+The hex value 0x7D3200 is the size of the zImage-6.1.59-stb-xen-cbe+ file, and that value is computed from the uboot-script-gen script available from here : https://gitlab.com/ViryaOS/imagebuilder
+
+Please note that most of the other values in the script generated by the ViryaOS uboot-script-gen do not work correctly with the Chromebook Snow, but the script does correctly calculate the size of the dom0 Linux kernel image.
+
+6. Create the binary script file that u-boot can load and install it in /boot :
+
+user@devuan-bunsen ~ % mkimage -A arm -T script -C none -a 0x50000000 -e 0x50000000 -d bootxen.source bootxen.scr
+user@devuan-bunsen ~ % sudo mv bootxen.scr /boot && sudo chown root:root /boot/bootxen.scr
+ 
+7. To boot Xen and the Linux kernel as dom0 on the Chromebook :
+ 
+Before the 3 second timout expires after rebooting or turning on the Chromebook, press a key to escape into the u-boot shell.
+
+Then type these commands to boot Xen and Linux 6.1.59 as dom0 :
+
+SMDK5250 # mmc dev 1
+SMDK5250 # ext2load mmc 1:3 0x50000000 bootxen.scr; source 0x50000000
+
+Expected result: The Chromebook will display the information about loading the image files and display the number of records it stashed at the bottom of the screen, and then the screen will go dark. However, the system still does boot, but without any support for the built-in display. If the Devuan linux userland (or any other userland that is installed) is configured to automatically connect to the network and also configured for remote access via ssh, it should be possible to login to the Linux system running as dom0 on Xen. The system logs should also indicate the system booted up as dom0 on Xen. In addition to the problem of the display not working, the Chromebook will not power off on its own even if the 'shutdown -h' or equivalent command is executed from the remote ssh session and it will be necessary to press the power button until the light on the power button goes off to fully power off and enable booting again.
+
+# Original (C) Copyright 2000 - 2012
+# Wolfgang Denk, DENX Software Engineering, wd@denx.de.
+#
+# See file CREDITS for list of people who contributed to this
+# project.
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of
+# the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307 USA
