@@ -1,6 +1,6 @@
-# Experimental Xen Support
+# Xen Support
 
-It is possible to boot Linux 6.1.y as Xen dom0 on the Chromebook xe303c12, aka Snow, but so far the graphics does not work.
+It is possible to boot Linux 6.1.y as Xen dom0 on the Chromebook xe303c12, aka Snow.
 
 ## Prerequisites
 This guide presumes the Chromebook Snow is already configured to boot Linux 5.4.257 with kvm support and Devuan 5 from an SD card as described in the top-level README of this repository.
@@ -38,7 +38,7 @@ The fourth partition might be much larger than shown here, but the other 3 parti
 On the first partition is the u-boot image that enables hypervisor mode, the second partition is unused, the third partition is mounted at /boot, and the fourth partition is mounted as the root partition.
 
 ## Adding support for Xen as a new installation (destroys user data in the current installation)
-This method of adding Xen support destroys the data on the root partition and the /boot partition and replaces it with new filesystem images that include both the 5.4.257-chromarietto-exy kernel with kvm support and the 6.1.59-stb-xen-cbe+ kernel with Xen support. Make backups of any data on the root partition or the /boot partition that you want to keep before proceeding with this method.
+This method of adding Xen support destroys the data on the root partition and the /boot partition and replaces it with new filesystem images that include both the 5.4.257-chromarietto-exy kernel with kvm support and the 6.1.61-stb-xen-cbe+ kernel with Xen support. Make backups of any data on the root partition or the /boot partition that you want to keep before proceeding with this method.
 
 These filesystem images are created from the Devuan 5 image here (the same source for Devuan 5 as in the top-level README):
 
@@ -125,21 +125,21 @@ Xen support requires a Linux kernel with support for runing as dom0 on the Xen h
 
 To install a kernel with Xen support as an upgrade of the installation with support for kvm created by following the instructions on the main README of this repository, follow these steps on the Chromebook to be upgraded with Xen support :
 
-1. Download the kernel from here : https://github.com/mobile-virt/arm-legacy-kvm/releases/download/2023-10-28/linux-6.1.59-stb-xen-cbe+-arm.tar.gz
+1. Download the kernel from here : https://github.com/mobile-virt/arm-legacy-kvm/releases/download/2023-11-04/linux-6.1.61-stb-xen-cbe+-arm.tar.gz
 
 2. Extract the necessary kernel files into the filesystem from the tar.gz kernel package :
 ```
 user@devuan-bunsen ~ % cd /
-user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.59-stb-xen-cbe+-arm.tar.gz boot/zImage-6.1.59-stb-xen-cbe+
-user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.59-stb-xen-cbe+-arm.tar.gz lib/modules
-user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.59-stb-xen-cbe+-arm.tar.gz boot/config-6.1.59-stb-xen-cbe+
-user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.59-stb-xen-cbe+-arm.tar.gz boot/dtbs/6.1.59-stb-xen-cbe+/exynos5250-snow.dtb
-user@devuan-bunsen / % sudo mv boot/dtbs/6.1.59-stb-xen-cbe+/exynos5250-snow.dtb boot/exynos5250-snow-6.1.59-stb-xen-cbe+.dtb
-user@devuan-bunsen / % sudo rmdir boot/dtbs/6.1.59-stb-xen-cbe+
+user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.61-stb-xen-cbe+-arm.tar.gz boot/zImage-6.1.61-stb-xen-cbe+
+user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.61-stb-xen-cbe+-arm.tar.gz lib/modules
+user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.61-stb-xen-cbe+-arm.tar.gz boot/config-6.1.61-stb-xen-cbe+
+user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.61-stb-xen-cbe+-arm.tar.gz boot/dtbs/6.1.61-stb-xen-cbe+/exynos5250-snow.dtb
+user@devuan-bunsen / % sudo mv boot/dtbs/6.1.61-stb-xen-cbe+/exynos5250-snow.dtb boot/exynos5250-snow-6.1.61-stb-xen-cbe+.dtb
+user@devuan-bunsen / % sudo rmdir boot/dtbs/6.1.61-stb-xen-cbe+
 ```
-This next one is optional and is only needed if booting this 6.1.59 kernel without Xen is desired or can be done later :
+This next one is optional and is only needed if booting this 6.1.61 kernel without Xen is desired or can be done later :
 
-`user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.59-stb-xen-cbe+-arm.tar.gz boot/uImage-6.1.59-stb-xen-cbe+`
+`user@devuan-bunsen / % sudo tar xfpz ~/Downloads/linux-6.1.61-stb-xen-cbe+-arm.tar.gz boot/uImage-6.1.61-stb-xen-cbe+`
 
 3. Next it is necessary to install the Xen system software packages and it is recommended to upgrade the packages :
 ```
@@ -153,7 +153,7 @@ user@devuan-bunsen / % sudo apt-get clean && sudo apt-get autoremove
 ```
 user@devuan-bunsen / % sudo mkimage -A arm -T kernel -C none -a 0x51004000 -e 0x51004000 -d xen-4.17-armhf xen-4.17-armhf-armmp-0x51004000.ub
 ```
-5. The 6.1.59 kernel looks for init at /init instead of /sbin/init. So create a symbolic like as follows if it does not exist :
+5. The 6.1.61 kernel looks for init at /init instead of /sbin/init. So create a symbolic like as follows if it does not exist :
 ```
 user@devuan-bunsen / % sudo ln -s sbin/init init
 ```
@@ -162,9 +162,9 @@ user@devuan-bunsen / % sudo ln -s sbin/init init
 Create a file in a work directory named bootxen.source with these contents : 
 ```
 mmc dev 1 && mmc rescan 1
-ext2load mmc 1:3 0x42000000 zImage-6.1.59-stb-xen-cbe+
+ext2load mmc 1:3 0x42000000 zImage-6.1.61-stb-xen-cbe+
 ext2load mmc 1:3 0x51000000 xen-4.17-armhf-armmp-0x51004000.ub
-ext2load mmc 1:3 0x5ffec000 exynos5250-snow-6.1.59-stb-xen-cbe+.dtb
+ext2load mmc 1:3 0x5ffec000 exynos5250-snow-6.1.61-stb-xen-cbe+.dtb
 fdt addr 0x5ffec000
 fdt resize 1024
 fdt set /chosen \#address-cells <0x2>
@@ -172,11 +172,11 @@ fdt set /chosen \#size-cells <0x2>
 fdt set /chosen xen,xen-bootargs "console=dtuart dtuart=serial0 dom0_mem=1G dom0_max_vcpus=2 bootscrub=0 vwfi=native sched=null"
 fdt mknod /chosen dom0
 fdt set /chosen/dom0 compatible  "xen,linux-zimage" "xen,multiboot-module" "multiboot,module"
-fdt set /chosen/dom0 reg <0x0 0x42000000 0x0 0x7D3200 >
+fdt set /chosen/dom0 reg <0x0 0x42000000 0x0 0x7D7200 >
 fdt set /chosen xen,dom0-bootargs "console=tty1 root=/dev/mmcblk1p4 rw rootwait clk_ignore_unused --no-log"
 bootm 0x51000000 - 0x5ffec000
 ```
-The hex value 0x7D3200 is the size of the zImage-6.1.59-stb-xen-cbe+ file, and that value is computed from the uboot-script-gen script available from here : https://gitlab.com/ViryaOS/imagebuilder
+The hex value 0x7D7200 is the size of the zImage-6.1.61-stb-xen-cbe+ file, and that value is computed from the uboot-script-gen script available from here : https://gitlab.com/ViryaOS/imagebuilder
 
 Please note that most of the other values in the script generated by the ViryaOS uboot-script-gen do not work correctly with the Chromebook Snow, but the script does correctly calculate the size of the dom0 Linux kernel image.
 
@@ -189,7 +189,7 @@ user@devuan-bunsen ~ % sudo mv bootxen.scr /boot && sudo chown root:root /boot/b
 
 Before the 3 second timout expires after rebooting or turning on the Chromebook, press a key to escape into the u-boot shell.
 
-Then type these commands to boot Xen and Linux 6.1.59 as dom0 :
+Then type these commands to boot Xen and Linux 6.1.61 as dom0 :
 ```
 SMDK5250 # mmc dev 1
 SMDK5250 # ext2load mmc 1:3 0x50000000 bootxen.scr; source 0x50000000
