@@ -1,6 +1,6 @@
 # Xen Support
 
-It is possible to boot Linux 6.1.y as Xen dom0 on the Chromebook xe303c12, aka Snow.
+This guide explains how to boot Linux 6.1.y as Xen dom0 on the Chromebook xe303c12, aka Snow and configure and start a very basic domU guest. Xen support requires a Linux kernel with support for runing as dom0 on the Xen hypervisor. For more information, please refer to the help pages at https://xenproject.org.
 
 ## Prerequisites
 This guide presumes the Chromebook Snow is already configured to boot Linux 5.4.257 with kvm support and Devuan 5 from an SD card as described in the top-level README of this repository.
@@ -61,18 +61,27 @@ Either remove the SD card from the Chromebook and plug it into another computer 
 
 3. Overwrite partition 3 and partition 4 with the downloaded images :
 
-**Warning!** - make sure the parameters of=/dev/mmcblk1p3 and of=/dev/mmcblk1p4 are the actual partitions on the SD card that the Chromebook boots from. A mistake here will cause data loss. You have been warned.
+**Warning! - make sure the parameters of=/dev/mmcblk1p3 and of=/dev/mmcblk1p4 are the actual partitions on the SD card that the Chromebook boots from. A mistake here will cause data loss. You have been warned.**
 ```
 localhost ~/Downloads $ gzip -c -d xe303c12_vubu-xen-BOOT3.img.gz | sudo dd of=/dev/mmcblk1p3 bs=1M
 localhost ~/Downloads $ gzip -c -d xe303c12_vubu-xen-ROOT4.img.gz | sudo dd of=/dev/mmcblk1p4 bs=1M
 ```
 Now the SD card should be prepared to boot into either the normal 5.4.257-chromarietto-exy system or into Xen and dom0 with Linux version 6.1.59, following step 8 in the section below, near the bottom of this page, on adding Xen support as an upgrade.
 
-These images were created as follows :
+4. Since the updated Linux kernel version 6.1.61 has a patch to fix a bug that causes a black screen on the display, download the 6.1.61 kernel from here :
+
+https://github.com/mobile-virt/arm-legacy-kvm/releases/download/2023-11-04/linux-6.1.61-stb-xen-cbe+-arm.tar.gz
+
+5. Install the 6.1.61-stb-xen-cbe+ kernel with the patch to fix the dark screen bug :
+
+Replace all the Linux kernel 6.1.59-stb-xen-cbe+ files on the /dev/mmcblk1p3 and /dev/mmcblk1p4 partitions with corresponding files for Linux kernel version 6.1.61-stb-xen-cbe+. These are the zImage-6.1.59-stb-xen-cbe+ file, the config-6.1.59-stb-xen-cbe+ file, the exynos5250-snow-6.1.59-stb-xen-cbe+.dtb file, and the bootxen.scr file on partition 3 of the SD card, and the lib/modules/6.1.59-stb-xen-cbe+ directory and all files under that directory on partition 4 of the SD card, and they should be replaced with the corresponding files for kernel version 6.1.61-stb-xen-cbe+. Except for the bootxen.scr file, these files can be extracted from the linux-6.1.61-stb-xen-cbe+-arm.tar.gz tarball. Follow the steps in the section Adding support for Xen as an upgrade at steps 6 and 7 to create and install the bootxen.scr file for Linux version 6.1.61-stb-xen-cbd+ on partition 3 of the SD card. Optionally delete the files for the 6.1.59-stb-xen-cbd+ kernel.
+
+## Creating the filesystem images (optional)
+These images should be created as follows with a 6.1.61-stb-xen-cbe+ kernel with the patch that fixes the dark screen bug (the actual kernel on the images at the download links above is still 6.1.59) :
 
 1. Complete the steps in the README of the top level of this repository to install Devuan 5 and the 5.4.257-chromarietto-exy kernel with support for kvm.
 
-2. Boot into the Devuan 5 system, and do sudo apt-get update && sudo apt-get upgrade after configuring the system for network access and setting the correct date and time.
+2. Boot into the Devuan 5 system, the initial password for user is 'q' (it should be changed!) and user is a member of the sudo group. Then run `sudo apt-get update && sudo apt-get upgrade` after configuring the system for network access and setting the correct date and time. More information about the lightweight Bunsen Labs system which uses the OpenBox Window manager that is used with this image is here : https://www.bunsenlabs.org/
 
 3. There will be an error from apt-get at this point, the bunsen-conky package fails on the first try because it conflicts with the bunsen-configs package. Fortunately, this is easy to fix :
 
@@ -94,35 +103,31 @@ user@devuan-bunsen ~ % sudo apt-get clean
 ```
 5. To boot Xen using u-boot, it is necessary to wrap the xen-4.17-armhf kernel in u-boot format with a LOADADDR set appropriately :
 ```
-user@devuan-bunsen ~ % cd /
-user@devuan-bunsen / % sudo mkimage -A arm -T kernel -C none -a 0x51004000 -e 0x51004000 -d xen-4.17-armhf xen-4.17-armhf-armmp-0x51004000.ub
+user@devuan-bunsen ~ % cd /boot
+user@devuan-bunsen /boot % sudo mkimage -A arm -T kernel -C none -a 0x51004000 -e 0x51004000 -d xen-4.17-armhf xen-4.17-armhf-armmp-0x51004000.ub
 ```
 6. Edit /var/lib/connman/settings - set WiFi enable to true
 
-7. Check that /etc/fstab has the two mount points for / and /boot (/ is ext4 and /boot is ext2). It should like :
+7. Check that /etc/fstab has the two mount points for / and /boot (/ is ext4 and /boot is ext2) and remove any entries that are no longer valid. It should like :
 ```
 LABEL=ROOT /    ext4    defaults 0       0
 LABEL=BOOT /boot    ext2    defaults 0       0
 ```
-8. Install the Linux 6.1.59-stb-xen-cbe+ kernel with Xen support according to the instructions below for adding support for Xen as an upgrade.
+8. Install the Linux 6.1.61-stb-xen-cbe+ kernel with Xen support according to the instructions below for adding support for Xen as an upgrade, steps 1 and 2.
 
-9. Follow steps 5 and 6 below to install the bootxen.scr script in /boot.
-
-10. The 6.1.59 kernel looks for init at /init instead of /sbin/init. So do :
+9. Some 6.1.y kernels look for init at /init instead of /sbin/init. So create a symbolic like as follows if it does not exist :
 ```
 user@devuan-bunsen ~ % cd /
 user@devuan-bunsen / % sudo ln -s sbin/init init
 ```
-11. Follow the steps in the next section at steps 6 and 7 to create and install the bootxen.scr file in /boot. Only the bootxen.scr file needs to be installed on the image, the bootxen.source file is only necessary to create the binary bootxen.scr using mkimage.
+10. Follow the steps in the next section Adding support for Xen as an upgrade at steps 6 and 7 to create and install the bootxen.scr file in /boot. Only the bootxen.scr file needs to be installed on the image at /boot, the bootxen.source file is only necessary to create the binary bootxen.scr using mkimage and can remain in /home/user.
 
-12. Shutdown the Chromebook and either reboot the Chromebook in Chrome OS mode or move the SD card to another computer to create the images with commands like this :
+11. Shutdown the Chromebook and either reboot the Chromebook in Chrome OS mode or move the SD card to another computer to create the images with commands like this :
 ```
 localhost ~/Downloads $ sudo dd if=/dev/mmcblk1p3 bs=1M | gzip - > xe303c12_vubu-xen-BOOT3.img.gz
 localhost ~/Downloads $ sudo dd if=/dev/mmcblk1p4 bs=1M | gzip - > xe303c12_vubu-xen-ROOT4.img.gz
 ```
 ## Adding support for Xen as an upgrade (does not destroy the current installation)
-Xen support requires a Linux kernel with support for runing as dom0 on the Xen hypervisor. For more information, please refer to support pages at https://xenproject.org.
-
 To install a kernel with Xen support as an upgrade of the installation with support for kvm created by following the instructions on the main README of this repository, follow these steps on the Chromebook to be upgraded with Xen support :
 
 1. Download the kernel from here : https://github.com/mobile-virt/arm-legacy-kvm/releases/download/2023-11-04/linux-6.1.61-stb-xen-cbe+-arm.tar.gz
@@ -149,17 +154,20 @@ user@devuan-bunsen / % sudo apt-get upgrade
 user@devuan-bunsen / % sudo apt-get dist-upgrade
 user@devuan-bunsen / % sudo apt-get clean && sudo apt-get autoremove
 ```
+If apt-get returns an error with the bunsen-configs or bunsen-conky packages during the `apt-get upgrade` step, the fix is described above at step 3 in the section above on creating the filesystem images.
 4. To boot Xen using u-boot, it is necessary to wrap the xen-4.17-armhf kernel in u-boot format with a LOADADDR set appropriately :
 ```
-user@devuan-bunsen / % sudo mkimage -A arm -T kernel -C none -a 0x51004000 -e 0x51004000 -d xen-4.17-armhf xen-4.17-armhf-armmp-0x51004000.ub
+user@devuan-bunsen / % cd boot
+user@devuan-bunsen /boot % sudo mkimage -A arm -T kernel -C none -a 0x51004000 -e 0x51004000 -d xen-4.17-armhf xen-4.17-armhf-armmp-0x51004000.ub
 ```
-5. The 6.1.61 kernel looks for init at /init instead of /sbin/init. So create a symbolic like as follows if it does not exist :
+5. Some 6.1.y kernels looks for init at /init instead of /sbin/init. So create a symbolic like as follows if it does not exist :
 ```
+user@devuan-bunsen /boot % cd /
 user@devuan-bunsen / % sudo ln -s sbin/init init
 ```
-6. Create the u-boot shell commands that will be used to boot Xen and dom0 :
+6. Create the u-boot shell commands that will be used to boot Xen and dom0.
 
-Create a file in a work directory named bootxen.source with these contents : 
+Create a file in a /home/user named bootxen.source with these contents :
 ```
 mmc dev 1 && mmc rescan 1
 ext2load mmc 1:3 0x42000000 zImage-6.1.61-stb-xen-cbe+
@@ -194,7 +202,18 @@ Then type these commands to boot Xen and Linux 6.1.61 as dom0 :
 SMDK5250 # mmc dev 1
 SMDK5250 # ext2load mmc 1:3 0x50000000 bootxen.scr; source 0x50000000
 ```
-Expected result: The Chromebook will display the information about loading the image files and display the number of records it stashed at the bottom of the screen, and then the screen will go dark. However, the system still does boot, but without any support for the built-in display. If the Devuan linux userland (or any other userland that is installed) is configured to automatically connect to the network and also configured for remote access via ssh, it should be possible to login to the Linux system running as dom0 on Xen. The system logs should also indicate the system booted up as dom0 on Xen. In addition to the problem of the display not working, the Chromebook will not power off on its own even if the 'shutdown -h' or equivalent command is executed from the remote ssh session and it will be necessary to press the power button until the light on the power button goes off to fully power off and enable booting again.
+Expected result: The Chromebook will boot into the Devuan 5 Bunsen labs desktop and automatically log into the user account. Check to see that Xen is working by reproducing this result (initial password is 'q' and it should be changed):
+```
+user@devuan-bunsen ~ % sudo xl list
+[sudo] password for user:
+Name                                        ID   Mem VCPUs      State   Time(s)
+Domain-0                                     0  1024     2     r-----     217.3
+user@devuan-bunsen ~ %
+```
+Note that there is another minor bug, and it is that when running on Xen, at shutdown the power does not turn off automatically and it is necessary to hold the power button for several seconds for the power to turn off the Chromebook.
+
+Other bugs: Most functions work, but sound does not with this kernel, and videos don't render well either with this kernel and video drivers.
+
 ### Copyright
 Original (C) Copyright 2000 - 2012
 Wolfgang Denk, DENX Software Engineering, wd@denx.de.
