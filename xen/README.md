@@ -177,7 +177,7 @@ fdt addr 0x5ffec000
 fdt resize 1024
 fdt set /chosen \#address-cells <0x2>
 fdt set /chosen \#size-cells <0x2>
-fdt set /chosen xen,xen-bootargs "console=dtuart dtuart=serial0 dom0_mem=1G dom0_max_vcpus=2 bootscrub=0 vwfi=native sched=null"
+fdt set /chosen xen,xen-bootargs "console=dtuart dtuart=serial0 dom0_mem=1G dom0_max_vcpus=2 bootscrub=0 vwfi=native"
 fdt mknod /chosen dom0
 fdt set /chosen/dom0 compatible  "xen,linux-zimage" "xen,multiboot-module" "multiboot,module"
 fdt set /chosen/dom0 reg <0x0 0x42000000 0x0 0x7D7200 >
@@ -214,6 +214,50 @@ Note that there is another minor bug, and it is that when running on Xen, at shu
 
 Other bugs: Most functions work, but sound does not with this kernel, and videos don't render well either with this kernel and video drivers.
 
+## Starting a domU guest
+On Xen, dom0 is usually both the management domain where the toolstack to manage guests is installed. Also, dom0 is usually the hardware domain that has privileged access to most of the hardware in the system, such as the real disk, wifi network interface, graphics display, etc. This system is configured so dom0 is both the privileged domain with direct access to the hardware and the management domain. Other domains are referred to as domU, the U stands for unprivileged and these unprivileged guests rely on paravirtualized (PV) drivers for disk and network access, video output, HID input devices, etc. The following steps describe how to configure and start a Debian domU guest.
+
+1. Since the Chromebook Snow is a low-memory system with 2 GB of memory, first reduce the allocation of memory for dom0 from 1 GB to 768 MB. This setiing is the dom0_mem setting in bootxen.source as follows in the line that sets the Xen boot arguments in bootxen.source:
+```
+fdt set /chosen xen,xen-bootargs "console=dtuart dtuart=serial0 dom0_mem=768M dom0_max_vcpus=2 bootscrub=0 vwfi=native"
+```
+Then re-generate and install the updated bootxen.scr in /boot and reboot so dom0 will now have 768 MB allocated to it:
+```
+user@devuan-bunsen ~ % mkimage -A arm -T script -C none -a 0x50000000 -e 0x50000000 -d bootxen.source bootxen.scr
+user@devuan-bunsen ~ % sudo mv bootxen.scr /boot && sudo chown root:root /boot/bootxen.scr
+```
+2. Create a file named debian.cfg in a directory to store domU configuration files with these contents :
+```
+kernel = '/data/kernels/zImage-6.1.61-stb-xen-cbe+'
+memory = '1152'
+name = 'debian'
+vcpus = '2'
+disk = [ '/data/debian.img,,xvda,w' ]
+extra = 'console=hvc0 root=/dev/xvda rw init=/sbin/init'
+```
+3. The same kernel for dom0 can be used for the domU guest:
+```
+user@devuan-bunsen ~ % sudo mkdir -p /data/kernels
+user@devuan-bunsen ~ % sudo cp -p /boot/zImage-6.1.61-stb-xen-cbe+ /data/kernels/zImage-6.1.61-stb-xen-cbe+
+```
+4. Obtain a useable root filesystem (rootfs) image file debian.img and install it at /data/debian.img
+There are many ways to obtain the rootfs filesystem image. If a Debian type system is desired, debootstrap can be used to create the image as described here: https://wiki.debian.org/Debootstrap
+
+It is important to note the base system on the rootfs must be compatible with the Debian armhf architecture to run it on the Chromebook Snow. The method of creating the guest disk image, debian.img, using debootstrap from a system that is already running on the Debian armhf architecture has been tested and it works on the Chromebook Snow.
+
+Another possible way to obtain a useable debian.img, not tested, is to obtain a filesystem image from Debian installation sites and mirrors here https://deb.debian.org/debian/dists/bookworm/main/installer-armhf/current/images/hd-media/ and search the contents for the file with the root filesystem and copy the root filesystem into the filesystem image debian.img.
+
+5. Try to start the guest:
+```
+user@devuan-bunsen ~ % sudo xl create debian.cfg -c
+```
+The -c option connects immediately to the guest console, so if the guest boots correctly the kernel log messages should appear and eventually a login prompt will appear.
+
+6. Use the key sequence to escape from the guest terminal back to the dom0 terminal. The default is ctrl-], but it may be different for different keyboard layouts, so search the Internet for the correct key sequence for the keyboard in use.
+
+7. Other useful xl commands: `sudo xl list` lists the guests that are on the system with some information about their state, `sudo xl shutdown < name | domID >` shuts down a running domain, and `sudo xl console < name | domID >` connects to a guest's console.
+
+8. Consult the `xl.cfg(5)` man page to extend the capabilities of the guest, such as adding a PV network device with the vif `xl.cfg(5)` setting, or to add other images for swap space or for other filesystems that can be added to the guest using the disk `xl.cfg(5)` setting and adding the disk image to the /etc/fstab file.
 ### Copyright
 Original (C) Copyright 2000 - 2012
 Wolfgang Denk, DENX Software Engineering, wd@denx.de.
