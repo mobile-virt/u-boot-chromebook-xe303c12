@@ -70,7 +70,7 @@ Now the SD card should be prepared to boot into either the normal 5.4.257-chroma
 
 4. Since the updated Linux kernel version 6.1.61 has a patch to fix a bug that causes a black screen on the display, download the 6.1.61 kernel from here :
 
-https://github.com/mobile-virt/arm-legacy-kvm/releases/download/2023-11-04/linux-6.1.61-stb-xen-cbe+-arm.tar.gz
+https://github.com/mobile-virt/arm-xen-kvm/releases/download/2023-11-04/linux-6.1.61-stb-xen-cbe+-arm.tar.gz
 
 5. Install the 6.1.61-stb-xen-cbe+ kernel with the patch to fix the dark screen bug :
 
@@ -130,7 +130,7 @@ localhost ~/Downloads $ sudo dd if=/dev/mmcblk1p4 bs=1M | gzip - > xe303c12_vubu
 ## Adding support for Xen as an upgrade (does not destroy the current installation)
 To install a kernel with Xen support as an upgrade of the installation with support for kvm created by following the instructions on the main README of this repository, follow these steps on the Chromebook to be upgraded with Xen support :
 
-1. Download the kernel from here : https://github.com/mobile-virt/arm-legacy-kvm/releases/download/2023-11-04/linux-6.1.61-stb-xen-cbe+-arm.tar.gz
+1. Download the kernel from here : https://github.com/mobile-virt/arm-xen-kvm/releases/download/2023-11-04/linux-6.1.61-stb-xen-cbe+-arm.tar.gz
 
 2. Extract the necessary kernel files into the filesystem from the tar.gz kernel package :
 ```
