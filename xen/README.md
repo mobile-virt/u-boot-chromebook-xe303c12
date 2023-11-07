@@ -167,7 +167,7 @@ user@devuan-bunsen / % sudo ln -s sbin/init init
 ```
 6. Create the u-boot shell commands that will be used to boot Xen and dom0.
 
-Create a file in a /home/user named bootxen.source with these contents :
+Create a file in /home/user (or any other directory) named bootxen.source with these contents :
 ```
 mmc dev 1 && mmc rescan 1
 ext2load mmc 1:3 0x42000000 zImage-6.1.61-stb-xen-cbe+
@@ -215,7 +215,7 @@ Note that there is another minor bug, and it is that when running on Xen, at shu
 Other bugs: Most functions work, but sound does not with this kernel, and videos don't render well either with this kernel and video drivers.
 
 ## Starting a domU guest
-On Xen, dom0 is usually both the management domain where the toolstack to manage guests is installed. Also, dom0 is usually the hardware domain that has privileged access to most of the hardware in the system, such as the real disk, wifi network interface, graphics display, etc. This system is configured so dom0 is both the privileged domain with direct access to the hardware and the management domain. Other domains are referred to as domU, the U stands for unprivileged and these unprivileged guests rely on paravirtualized (PV) drivers for disk and network access, video output, HID input devices, etc. The following steps describe how to configure and start a Debian domU guest.
+On Xen, dom0 is usually the management domain where the toolstack to manage guests is installed. Also, dom0 is usually the hardware domain that has privileged access to most of the hardware in the system, such as the real disk, wifi network interface, graphics display, etc. This system is configured so dom0 is both the privileged domain with direct access to the hardware and the management domain. Other domains are referred to as domU, the U stands for unprivileged and these unprivileged guests rely on paravirtualized (PV) drivers for disk and network access, video output, HID input devices, etc. The following steps describe how to configure and start a Debian domU guest.
 
 1. Since the Chromebook Snow is a low-memory system with 2 GB of memory, first reduce the allocation of memory for dom0 from 1 GB to 768 MB. This setiing is the dom0_mem setting in bootxen.source as follows in the line that sets the Xen boot arguments in bootxen.source:
 ```
