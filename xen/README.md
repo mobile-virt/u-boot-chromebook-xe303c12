@@ -258,6 +258,29 @@ The -c option connects immediately to the guest console, so if the guest boots c
 7. Other useful xl commands: `sudo xl list` lists the guests that are on the system with some information about their state, `sudo xl shutdown < name | domID >` shuts down a running domain, and `sudo xl console < name | domID >` connects to a guest's console.
 
 8. Consult the `xl.cfg(5)` man page to extend the capabilities of the guest, such as adding a PV network device with the vif `xl.cfg(5)` setting, or to add other images for swap space or for other filesystems that can be added to the guest using the disk `xl.cfg(5)` setting and adding the disk image to the /etc/fstab file.
+
+9. Some capabilities, such as the vfb device, require the qemu device model, and if it is not installed this error is returned on Debian and Debian drivative systems :
+```
+user@devuan-bunsen ~ % sudo xl create debian.cfg
+Parsing config from debian.cfg
+libxl: error: libxl_dm.c:2899:libxl__spawn_local_dm: Domain 15:device model /usr/libexec/xen-qemu-system-i386 is not executable: No such file or directory
+libxl: error: libxl_dm.c:2901:libxl__spawn_local_dm: Domain 15:Please install the qemu-system-xen package for this domain to work
+libxl: error: libxl_dm.c:3151:device_model_spawn_outcome: Domain 15:(null): spawn failed (rc=-3)
+libxl: error: libxl_dm.c:3371:device_model_postconfig_done: Domain 15:Post DM startup configs failed, rc=-3
+libxl: error: libxl_create.c:1896:domcreate_devmodel_started: Domain 15:device model did not start: -3
+libxl: error: libxl_domain.c:1183:libxl__destroy_domid: Domain 15:Non-existant domain
+libxl: error: libxl_domain.c:1137:domain_destroy_callback: Domain 15:Unable to destroy guest
+libxl: error: libxl_domain.c:1064:domain_destroy_cb: Domain 15:Destruction of domain failed
+user@devuan-bunsen ~ %
+```
+Debian only the provides the qemu-system-xen package for the amd64 architecture, so a build for armhf is provided here :
+
+https://github.com/mobile-virt/arm-xen-kvm/releases/download/2023-11-07-qemu/qemu-system-xen_7.2+dfsg-7+deb12u2_armhf.deb
+
+The package has been tested to work with a setting like this in the `xl.cfg(5)` file:
+```
+vfb = [ 'type=vnc,vnclisten=0.0.0.0,vncdisplay=1' ]
+```
 ### Copyright
 Original (C) Copyright 2000 - 2012
 Wolfgang Denk, DENX Software Engineering, wd@denx.de.
