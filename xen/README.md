@@ -233,8 +233,10 @@ memory = '1152'
 name = 'debian'
 vcpus = '2'
 disk = [ '/data/debian.img,,xvda,w' ]
-extra = 'console=hvc0 root=/dev/xvda rw init=/sbin/init'
+extra = 'console=hvc0 root=/dev/xvda rw init=/sbin/init xen-fbfront.video=24,1024,768'
 ```
+The xen-fbfront.video setting is for the color depth and geometry of the virtual framebuffer (vfb) device.
+
 3. The same kernel for dom0 can be used for the domU guest:
 ```
 user@devuan-bunsen ~ % sudo mkdir -p /data/kernels
