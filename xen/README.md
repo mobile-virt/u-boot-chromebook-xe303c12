@@ -181,7 +181,7 @@ fdt set /chosen xen,xen-bootargs "console=dtuart dtuart=serial0 dom0_mem=1G dom0
 fdt mknod /chosen dom0
 fdt set /chosen/dom0 compatible  "xen,linux-zimage" "xen,multiboot-module" "multiboot,module"
 fdt set /chosen/dom0 reg <0x0 0x42000000 0x0 0x7D7200 >
-fdt set /chosen xen,dom0-bootargs "console=tty1 root=/dev/mmcblk1p4 rw rootwait clk_ignore_unused --no-log"
+fdt set /chosen xen,dom0-bootargs "console=tty1 root=/dev/mmcblk1p4 rw rootwait clk_ignore_unused"
 bootm 0x51000000 - 0x5ffec000
 ```
 The hex value 0x7D7200 is the size of the zImage-6.1.61-stb-xen-cbe+ file, and that value is computed from the uboot-script-gen script available from here : https://gitlab.com/ViryaOS/imagebuilder
