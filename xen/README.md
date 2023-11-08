@@ -283,6 +283,37 @@ The package has been tested to work with a setting like this in the `xl.cfg(5)` 
 ```
 vfb = [ 'type=vnc,vnclisten=0.0.0.0,vncdisplay=1' ]
 ```
+### Connecting Xen domU to a network
+There are some guides available :
+
+https://wiki.xenproject.org/wiki/Xen_Networking
+
+https://debian-handbook.info/browse/stable/sect.virtualization.html in the section on Xen, which has a section on networking
+
+https://wiki.archlinux.org/title/xen in the section on networking
+
+Most guides explain how to setup a bridged connection to a wired interface. However, the Chromebook Snow uses a wireless interface for an external network connection, and a bridge between a wireless interface and the virtual interface vifN.0 will fail with an "operation not supported" or similar error.
+
+Xen also provides the vif-route and vif-nat scripts as alternate ways to connect to the network.
+
+For this device, very often the vif-route script does not work without some patches. So something like this should work for the network configuration in the guest :
+```
+vif = [ 'type=vif,mac=00:16:3e:xx:xx:xx,script=vif-route-local,ip=192.168.1.x' ]
+```
+The first 24 bits (00:16:3e) of the mac address is assigned for vendor Xen, and a random 24 bit number should be used to generate the last 24 bits of the mac address of the virtual network interface in the guest. If there is no mac address setting, a different random 24 bits will be generated each time the guest starts so to connect to some networks it is helpful to set a persisent mac address for the guest network interface.
+
+The script setting refers to the name of a script with execute permissions installed in the /etc/xen/scripts directory. By default it is /etc/xen/scripts/vif-bridge, but it can be changed in the /etc/xen/xl.conf file or the script for a particular guest can be specified in the domain `xl.cfg(5)` file as shown above. In this case, a custom script named vif-route-local is configured. Many network setups will require a custom network script and/or patches to the /etc/xen/xl.conf file. The last setting is optional, and it sets an ip address to use for the guest interface, and that value is passed to the vif-route-local network script in the 'ip' shell variable, which can be used to confiugre the network in cases when the script needs to know the IP address of the interfface in the guest. This is needed to confiugre routing or neighbour discovery with `ip route ...`, `ip neighbour ...`, and `arp ...` commands to configure neighbour discovery and routing for the guest.
+Another setting to change in the /etc/xen/xl.conf file is the name of the gateway interface, so it matches the name of the interface in the Chromebook Snow :
+```
+#vif.default.gatewaydev="eth0"
+vif.default.gatewaydev="mlan0"
+```
+The Devuan Bunsen labs image used in these instructions uses `connman` to configure networking in dom0 and it helps to configure connman to ignore the network interfaces that libxl creates and configures with network scripts, which are names starting with vif :
+```
+NetworkInterfaceBlacklist = vif,vmnet,vboxnet,virbr,ifb,ve-,vb-
+```
+This setting is in the /etc/connman/main.conf file.
+```
 ### Copyright
 Original (C) Copyright 2000 - 2012
 Wolfgang Denk, DENX Software Engineering, wd@denx.de.
