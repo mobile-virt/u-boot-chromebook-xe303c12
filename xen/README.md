@@ -132,6 +132,12 @@ To install a kernel with Xen support as an upgrade of the installation with supp
 
 1. Download the kernel from here : https://github.com/mobile-virt/arm-xen-kvm/releases/download/2023-11-04/linux-6.1.61-stb-xen-cbe+-arm.tar.gz
 
+This kernel includes a patch to fix an error that causes no display on either the built-in display or on a monitor connected to the HDMI port of the Chromebook. So if you decide to build your own kernel, make sure it includes the patch to fix the error that is available here:
+
+https://github.com/mobile-virt/arm-xen-kvm/blob/main/patches/arm-mm-add-option-prefer-iommu-dma-on-xen.patch
+
+Select the "Prefer IOMMU DMA ops on Xen" kernel config option (CONFIG_ARM_DMA_USE_IOMMU_XEN) when prompted during the 'make config' stage of the kernel build to include the patch that fixes the error.
+
 2. Extract the necessary kernel files into the filesystem from the tar.gz kernel package :
 ```
 user@devuan-bunsen ~ % cd /
