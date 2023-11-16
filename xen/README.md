@@ -161,6 +161,7 @@ user@devuan-bunsen / % sudo apt-get dist-upgrade
 user@devuan-bunsen / % sudo apt-get clean && sudo apt-get autoremove
 ```
 If apt-get returns an error with the bunsen-configs or bunsen-conky packages during the `apt-get upgrade` step, the fix is described above at step 3 in the section above on creating the filesystem images.
+
 4. To boot Xen using u-boot, it is necessary to wrap the xen-4.17-armhf kernel in u-boot format with a LOADADDR set appropriately :
 ```
 user@devuan-bunsen / % cd boot
