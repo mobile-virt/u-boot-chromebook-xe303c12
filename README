@@ -192,15 +192,7 @@ listen-address=127.0.0.1
 
 # virsh domcapabilities --machine virt --emulatorbin /usr/local/bin/qemu-system-arm
 
-24) experiment with Xen: see https://github.com/mobile-virt/u-boot-chromebook-xe303c12/tree/chromebook/xen for more information.
-
-
-
-
-
-
-
-
+25) if you want to experiment with Xen: see https://github.com/mobile-virt/u-boot-chromebook-xe303c12/tree/chromebook/xen for more information.
 
 # Original (C) Copyright 2000 - 2012
 # Wolfgang Denk, DENX Software Engineering, wd@denx.de.
